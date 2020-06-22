@@ -1,4 +1,5 @@
-                             deltaSHAPE
+deltaSHAPE
+==========
 
   What is it?
   -----------
