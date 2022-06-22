@@ -257,7 +257,7 @@ if __name__ == '__main__':
     
     sigdiff = []
     for i in range(site_pad, len(diff)-site_pad):
-        win = range(i-site_pad ,i+site_pad+1)
+        win = list(range(i-site_pad ,i+site_pad+1))
         count = 0
         maybes = []
         for j in win:
@@ -274,10 +274,10 @@ if __name__ == '__main__':
     # this is mostly for figuring which regions to highlight in the plot.
     
     pos_consec, neg_consec = [], []
-    for k, g in groupby(enumerate([i for i in sigdiff if s_diff[i] >= 0]), lambda (i,x):i-x):
-            pos_consec.append(map(itemgetter(1), g))
-    for k, g in groupby(enumerate([i for i in sigdiff if s_diff[i] < 0]), lambda (i,x):i-x):
-            neg_consec.append(map(itemgetter(1), g))
+    for k, g in groupby(enumerate([i for i in sigdiff if s_diff[i] >= 0]), lambda i_x:i_x[0]-i_x[1]):
+            pos_consec.append(list(map(itemgetter(1), g)))
+    for k, g in groupby(enumerate([i for i in sigdiff if s_diff[i] < 0]), lambda i_x1:i_x1[0]-i_x1[1]):
+            neg_consec.append(list(map(itemgetter(1), g)))
 
     pos_shade_bits, pos_x_bits = [], []
     pos_span = []
@@ -316,7 +316,7 @@ if __name__ == '__main__':
         import matplotlib.pyplot as plt
     
         plt.figure(figsize=(11,4))
-        x = range(1,len(s_diff)+1)
+        x = list(range(1,len(s_diff)+1))
         
         plt.plot(x, s_diff, drawstyle='steps-mid', color='black')
         plt.axhline(0, color='black')
@@ -357,15 +357,15 @@ if __name__ == '__main__':
         
         # set ymin and ymax automatically from data, or from option flags.
         if args.ymin == -999:
-            y_min = min(filter(lambda x: np.isnan(x)==False, s_diff))-0.25
+            y_min = min([x for x in s_diff if np.isnan(x)==False])-0.25
         else:
             y_min = args.ymin
 
         if args.ymax == -999:
-            y_max = max(filter(lambda x: np.isnan(x)==False, s_diff))+0.25
+            y_max = max([x for x in s_diff if np.isnan(x)==False])+0.25
             # adjust y_max if dots are involved.    
             if dots:
-                y_max = max(filter(lambda x: np.isnan(x)==False, s_diff))+0.6
+                y_max = max([x for x in s_diff if np.isnan(x)==False])+0.6
         else:
             y_max = args.ymax
         
@@ -401,7 +401,7 @@ if __name__ == '__main__':
     
     if args.all:
         # get data for all nucleotides not already in data_out, but replace s_diff[i] with zero.
-        for i in filter(lambda x: x+1 not in [j[0] for j in data_out], range(len(seq1))):
+        for i in [x for x in range(len(seq1)) if x+1 not in [j[0] for j in data_out]]:
             data_out.append([i+1, seq1[i], 0, z_factors[i], z_scores[i], s_data1[i], s_data2[i], diff[i], data1[i], data2[i]])
     
     # write the file
