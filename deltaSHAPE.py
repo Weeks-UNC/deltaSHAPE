@@ -28,7 +28,6 @@ import sys
 import os
 import argparse
 import numpy as np
-import scipy.stats as stats
 from operator import itemgetter
 from itertools import groupby
 import warnings
@@ -75,8 +74,8 @@ def smooth(data,err,pad):
         # use numpy masked array to calculate average without including no-data (nan) nucleotides.
         new_data.append(np.mean(np.ma.MaskedArray([j for j in data[i-pad:i+pad+1]], np.isnan([j for j in data[i-pad:i+pad+1]]))))
         
-        # use stats.nanmean to calculate average without including no-data (nan) nucleotides. This causes long_scalars runtime warnings.
-        #new_data.append(stats.nanmean([j for j in data[i-pad:i+pad+1] if np.isnan(j) != True]))
+        # use np.nanmean to calculate average without including no-data (nan) nucleotides. This causes long_scalars runtime warnings.
+        #new_data.append(np.nanmean([j for j in data[i-pad:i+pad+1] if np.isnan(j) != True]))
         errs = np.array(err[i-pad:i+pad+1])
         squerrs = np.power([j for j in errs if np.isnan(j) != True], 2)
         total = np.sum(squerrs)
@@ -106,8 +105,8 @@ def z_factor(data1, data2, err1, err2, factor=1.96):
     return z_factors
 
 def calc_zScores(diffs):
-    mean = stats.nanmean(diffs)
-    sigma = stats.nanstd(diffs)
+    mean = np.nanmean(diffs)
+    sigma = np.nanstd(diffs)
     # calc Z-score
     z_scores = (diffs - mean) / sigma
     return np.array(z_scores)
@@ -206,7 +205,7 @@ if __name__ == '__main__':
     outfile = os.path.normpath(args.out)
     if args.pdf:
         #pdf_file = str(os.path.basename(os.path.normpath(args.out)).split('.')[:-1][0])+".pdf"
-        pdf_file = str(os.path.normpath(args.out)).split('.')[0]+".pdf"
+        pdf_file = str(os.path.normpath(args.out)).split('.t')[0]+".pdf"
     
     # check other variables
     if args.ymin > args.ymax:
@@ -382,7 +381,7 @@ if __name__ == '__main__':
         # label axes and format ticks
         plt.xlabel("Nucleotide")
         plt.ylabel(r'$\Delta$SHAPE')
-        plt.tick_params(which='both', direction='out', top='off', right='off')
+        plt.tick_params(which='both', direction='out', top=False, right=False)
         
         # turn off UserWarnings temporarily so that plt.tight_layout() doesn't print a warning to the screen.
         warnings.simplefilter("ignore", UserWarning)
